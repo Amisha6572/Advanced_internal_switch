@@ -46,6 +46,7 @@ with st.sidebar:
             st.rerun()
     else:
         st.page_link("pages/login.py", label="Login", icon="🔐")
+        # Only show Register when not logged in
         st.page_link("pages/register.py", label="Register", icon="📝")
 
 # ── Home page ─────────────────────────────────────────────────────────────────
@@ -63,9 +64,14 @@ if not logged_in:
             st.switch_page("pages/register.py")
 else:
     st.success(f"Welcome back, {st.session_state['full_name']}!")
-    if role == "hr":
-        if st.button("Go to HR Dashboard", type="primary"):
-            st.switch_page("pages/hr_dashboard.py")
-    else:
-        if st.button("Go to My Dashboard", type="primary"):
-            st.switch_page("pages/employee_dashboard.py")
+    # Grey out register — show disabled button instead
+    col1, col2 = st.columns(2)
+    with col1:
+        if role == "hr":
+            if st.button("Go to HR Dashboard", type="primary", use_container_width=True):
+                st.switch_page("pages/hr_dashboard.py")
+        else:
+            if st.button("Go to My Dashboard", type="primary", use_container_width=True):
+                st.switch_page("pages/employee_dashboard.py")
+    with col2:
+        st.button("Register", use_container_width=True, disabled=True, help="You are already logged in")

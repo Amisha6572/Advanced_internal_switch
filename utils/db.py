@@ -17,6 +17,7 @@ def _build_db_config():
             "password": secrets.get("DB_PASSWORD", DB_CONFIG["password"]),
             "database": secrets.get("DB_NAME", DB_CONFIG["database"]),
             "port":     int(secrets.get("DB_PORT", DB_CONFIG["port"])),
+            "ssl_disabled": False,
         }
     except Exception:
         return DB_CONFIG

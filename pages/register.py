@@ -107,7 +107,7 @@ elif step == 2:
         if not categories:
             categories = ["General"]
 
-        skill_entries = []  # list of (skill_id, skill_name, proficiency)
+        skill_entries = []  # list of (skill_id, skill_name, proficiency, years_exp)
 
         with st.form("skills_form"):
             st.markdown("For each category, select the skills you have and set your proficiency (1=Beginner → 5=Expert).")
@@ -120,14 +120,23 @@ elif step == 2:
                     with cols[i % 2]:
                         selected = st.checkbox(skill_row["skill_name"], key=f"sk_{skill_row['skill_id']}")
                         if selected:
-                            prof = st.select_slider(
-                                f"Proficiency — {skill_row['skill_name']}",
-                                options=[1, 2, 3, 4, 5],
-                                format_func=lambda x: PROFICIENCY_LABELS[x],
-                                value=3,
-                                key=f"prof_{skill_row['skill_id']}"
-                            )
-                            skill_entries.append((int(skill_row["skill_id"]), skill_row["skill_name"], prof))
+                            rc1, rc2 = st.columns(2)
+                            with rc1:
+                                prof = st.select_slider(
+                                    f"Proficiency",
+                                    options=[1, 2, 3, 4, 5],
+                                    format_func=lambda x: PROFICIENCY_LABELS[x],
+                                    value=3,
+                                    key=f"prof_{skill_row['skill_id']}"
+                                )
+                            with rc2:
+                                yrs = st.number_input(
+                                    f"Years Exp",
+                                    min_value=0.0, max_value=40.0,
+                                    value=0.0, step=0.5,
+                                    key=f"yrs_{skill_row['skill_id']}"
+                                )
+                            skill_entries.append((int(skill_row["skill_id"]), skill_row["skill_name"], prof, yrs))
                 st.divider()
 
             col_skip, col_save = st.columns([1, 1])
@@ -140,13 +149,13 @@ elif step == 2:
             if save and skill_entries:
                 saved = 0
                 errors = []
-                for skill_id, skill_name, prof in skill_entries:
+                for skill_id, skill_name, prof, yrs in skill_entries:
                     try:
                         upsert_employee_skill(
                             emp_id=emp_id,
                             skill_id=skill_id,
                             proficiency=prof,
-                            years_exp=0,
+                            years_exp=yrs,
                             last_used=date.today().strftime("%Y-%m-%d"),
                             cert_status="None"
                         )
